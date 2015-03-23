@@ -1,8 +1,0 @@
-// $ Id: $
-// vim:ft=javascript
-
-ARG_ENABLE('sigsock' , 'The unknown extension', 'no');
-if (PHP_SIGSOCK == "yes") {
-  EXTENSION("sigsock", "sigsock.c");
-  AC_DEFINE("HAVE_SIGSOCK", 1, "sigsock support");
-}

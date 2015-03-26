@@ -21,8 +21,9 @@ extern "C" {
 #include <php.h>
 
 #ifdef HAVE_SIGSOCK
-#define PHP_SIGSOCK_VERSION "0.0.1dev"
+#define PHP_SIGSOCK_VERSION "0.1.0"
 
+#define SIGSOCK_MAX_SIGNALS	32
 
 #include <php_ini.h>
 #include <SAPI.h>
@@ -50,23 +51,20 @@ PHP_RINIT_FUNCTION(sigsock);
 PHP_RSHUTDOWN_FUNCTION(sigsock);
 PHP_MINFO_FUNCTION(sigsock);
 
+ZEND_BEGIN_MODULE_GLOBALS(sigsock)
+	int socktable[SIGSOCK_MAX_SIGNALS+1];
+	zval *streamtable[SIGSOCK_MAX_SIGNALS+1];
+ZEND_END_MODULE_GLOBALS(sigsock)
+
+#ifdef ZTS
+#define SIGSOCK_G(v) TSRMG(sigsock_globals_id, zend_sigsock_globals *, v)
+#else
+#define SIGSOCK_G(v)  (sigsock_globals.v)
+#endif
+
 #ifdef ZTS
 #include "TSRM.h"
 #endif
-
-#define FREE_RESOURCE(resource) zend_list_delete(Z_LVAL_P(resource))
-
-#define PROP_GET_LONG(name)    Z_LVAL_P(zend_read_property(_this_ce, _this_zval, #name, strlen(#name), 1 TSRMLS_CC))
-#define PROP_SET_LONG(name, l) zend_update_property_long(_this_ce, _this_zval, #name, strlen(#name), l TSRMLS_CC)
-
-#define PROP_GET_DOUBLE(name)    Z_DVAL_P(zend_read_property(_this_ce, _this_zval, #name, strlen(#name), 1 TSRMLS_CC))
-#define PROP_SET_DOUBLE(name, d) zend_update_property_double(_this_ce, _this_zval, #name, strlen(#name), d TSRMLS_CC)
-
-#define PROP_GET_STRING(name)    Z_STRVAL_P(zend_read_property(_this_ce, _this_zval, #name, strlen(#name), 1 TSRMLS_CC))
-#define PROP_GET_STRLEN(name)    Z_STRLEN_P(zend_read_property(_this_ce, _this_zval, #name, strlen(#name), 1 TSRMLS_CC))
-#define PROP_SET_STRING(name, s) zend_update_property_string(_this_ce, _this_zval, #name, strlen(#name), s TSRMLS_CC)
-#define PROP_SET_STRINGL(name, s, l) zend_update_property_stringl(_this_ce, _this_zval, #name, strlen(#name), s, l TSRMLS_CC)
-
 
 #ifdef  __cplusplus
 } // extern "C" 
